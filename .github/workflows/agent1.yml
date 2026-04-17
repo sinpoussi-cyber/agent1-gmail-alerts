@@ -2,11 +2,11 @@ name: Agent 1 - Gmail Google Alerts
 
 on:
   schedule:
-    - cron: '0 * * * *'        # Collecte toutes les heures
-    - cron: '0 20 * * *'       # Rapport journalier à 20h UTC
-    - cron: '0 7 * * 1'        # Rapport hebdo lundi 7h UTC
-    - cron: '0 7 1 * *'        # Rapport mensuel 1er du mois 7h UTC
-  workflow_dispatch:             # Permet de lancer manuellement
+    - cron: '0 * * * *'
+    - cron: '0 20 * * *'
+    - cron: '0 7 * * 1'
+    - cron: '0 7 1 * *'
+  workflow_dispatch:
 
 jobs:
   collect:
@@ -14,15 +14,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
       - name: Install dependencies
-        run: pip install google-auth google-auth-oauthlib google-api-python-client requests beautifulsoup4 anthropic "supabase==2.3.0" python-dotenv postgrest gotrue httpx realtime storage3
-
+        run: pip install google-auth google-auth-oauthlib google-api-python-client requests beautifulsoup4 "anthropic==0.49.0" "supabase==2.3.0" python-dotenv postgrest gotrue "httpx==0.27.0" "httpcore==1.0.9" realtime storage3
       - name: Create .env
         run: |
           echo "GMAIL_CLIENT_ID=${{ secrets.GMAIL_CLIENT_ID }}" >> .env
@@ -33,10 +29,8 @@ jobs:
           echo "ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}" >> .env
           echo "REPORT_EMAIL_FROM=${{ secrets.REPORT_EMAIL_FROM }}" >> .env
           echo "REPORT_EMAIL_TO=${{ secrets.REPORT_EMAIL_TO }}" >> .env
-
       - name: Create token.json
         run: echo '${{ secrets.GMAIL_TOKEN_JSON }}' > token.json
-
       - name: Run collect
         run: python main.py --mode=collect
 
@@ -49,7 +43,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install dependencies
-        run: pip install google-auth google-auth-oauthlib google-api-python-client requests beautifulsoup4 anthropic "supabase==2.3.0" python-dotenv postgrest gotrue httpx realtime storage3
+        run: pip install google-auth google-auth-oauthlib google-api-python-client requests beautifulsoup4 "anthropic==0.49.0" "supabase==2.3.0" python-dotenv postgrest gotrue "httpx==0.27.0" "httpcore==1.0.9" realtime storage3
       - name: Create .env
         run: |
           echo "GMAIL_CLIENT_ID=${{ secrets.GMAIL_CLIENT_ID }}" >> .env
@@ -74,7 +68,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install dependencies
-        run: pip install google-auth google-auth-oauthlib google-api-python-client requests beautifulsoup4 anthropic "supabase==2.3.0" python-dotenv postgrest gotrue httpx realtime storage3
+        run: pip install google-auth google-auth-oauthlib google-api-python-client requests beautifulsoup4 "anthropic==0.49.0" "supabase==2.3.0" python-dotenv postgrest gotrue "httpx==0.27.0" "httpcore==1.0.9" realtime storage3
       - name: Create .env
         run: |
           echo "GMAIL_CLIENT_ID=${{ secrets.GMAIL_CLIENT_ID }}" >> .env
@@ -99,7 +93,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install dependencies
-        run: pip install google-auth google-auth-oauthlib google-api-python-client requests beautifulsoup4 anthropic "supabase==2.3.0" python-dotenv postgrest gotrue httpx realtime storage3
+        run: pip install google-auth google-auth-oauthlib google-api-python-client requests beautifulsoup4 "anthropic==0.49.0" "supabase==2.3.0" python-dotenv postgrest gotrue "httpx==0.27.0" "httpcore==1.0.9" realtime storage3
       - name: Create .env
         run: |
           echo "GMAIL_CLIENT_ID=${{ secrets.GMAIL_CLIENT_ID }}" >> .env

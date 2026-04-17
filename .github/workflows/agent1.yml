@@ -1,0 +1,116 @@
+name: Agent 1 - Gmail Google Alerts
+
+on:
+  schedule:
+    - cron: '0 * * * *'        # Collecte toutes les heures
+    - cron: '0 20 * * *'       # Rapport journalier à 20h UTC
+    - cron: '0 7 * * 1'        # Rapport hebdo lundi 7h UTC
+    - cron: '0 7 1 * *'        # Rapport mensuel 1er du mois 7h UTC
+  workflow_dispatch:             # Permet de lancer manuellement
+
+jobs:
+  collect:
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 * * * *'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install google-auth google-auth-oauthlib google-api-python-client requests beautifulsoup4 anthropic "supabase==2.3.0" python-dotenv postgrest gotrue httpx realtime storage3
+
+      - name: Create .env
+        run: |
+          echo "GMAIL_CLIENT_ID=${{ secrets.GMAIL_CLIENT_ID }}" >> .env
+          echo "GMAIL_CLIENT_SECRET=${{ secrets.GMAIL_CLIENT_SECRET }}" >> .env
+          echo "GMAIL_REFRESH_TOKEN=${{ secrets.GMAIL_REFRESH_TOKEN }}" >> .env
+          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" >> .env
+          echo "SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}" >> .env
+          echo "ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}" >> .env
+          echo "REPORT_EMAIL_FROM=${{ secrets.REPORT_EMAIL_FROM }}" >> .env
+          echo "REPORT_EMAIL_TO=${{ secrets.REPORT_EMAIL_TO }}" >> .env
+
+      - name: Create token.json
+        run: echo '${{ secrets.GMAIL_TOKEN_JSON }}' > token.json
+
+      - name: Run collect
+        run: python main.py --mode=collect
+
+  rapport-jour:
+    if: github.event.schedule == '0 20 * * *'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install google-auth google-auth-oauthlib google-api-python-client requests beautifulsoup4 anthropic "supabase==2.3.0" python-dotenv postgrest gotrue httpx realtime storage3
+      - name: Create .env
+        run: |
+          echo "GMAIL_CLIENT_ID=${{ secrets.GMAIL_CLIENT_ID }}" >> .env
+          echo "GMAIL_CLIENT_SECRET=${{ secrets.GMAIL_CLIENT_SECRET }}" >> .env
+          echo "GMAIL_REFRESH_TOKEN=${{ secrets.GMAIL_REFRESH_TOKEN }}" >> .env
+          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" >> .env
+          echo "SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}" >> .env
+          echo "ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}" >> .env
+          echo "REPORT_EMAIL_FROM=${{ secrets.REPORT_EMAIL_FROM }}" >> .env
+          echo "REPORT_EMAIL_TO=${{ secrets.REPORT_EMAIL_TO }}" >> .env
+      - name: Create token.json
+        run: echo '${{ secrets.GMAIL_TOKEN_JSON }}' > token.json
+      - name: Run rapport journalier
+        run: python main.py --mode=rapport-jour
+
+  rapport-hebdo:
+    if: github.event.schedule == '0 7 * * 1'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install google-auth google-auth-oauthlib google-api-python-client requests beautifulsoup4 anthropic "supabase==2.3.0" python-dotenv postgrest gotrue httpx realtime storage3
+      - name: Create .env
+        run: |
+          echo "GMAIL_CLIENT_ID=${{ secrets.GMAIL_CLIENT_ID }}" >> .env
+          echo "GMAIL_CLIENT_SECRET=${{ secrets.GMAIL_CLIENT_SECRET }}" >> .env
+          echo "GMAIL_REFRESH_TOKEN=${{ secrets.GMAIL_REFRESH_TOKEN }}" >> .env
+          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" >> .env
+          echo "SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}" >> .env
+          echo "ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}" >> .env
+          echo "REPORT_EMAIL_FROM=${{ secrets.REPORT_EMAIL_FROM }}" >> .env
+          echo "REPORT_EMAIL_TO=${{ secrets.REPORT_EMAIL_TO }}" >> .env
+      - name: Create token.json
+        run: echo '${{ secrets.GMAIL_TOKEN_JSON }}' > token.json
+      - name: Run rapport hebdo
+        run: python main.py --mode=rapport-hebdo
+
+  rapport-mensuel:
+    if: github.event.schedule == '0 7 1 * *'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install google-auth google-auth-oauthlib google-api-python-client requests beautifulsoup4 anthropic "supabase==2.3.0" python-dotenv postgrest gotrue httpx realtime storage3
+      - name: Create .env
+        run: |
+          echo "GMAIL_CLIENT_ID=${{ secrets.GMAIL_CLIENT_ID }}" >> .env
+          echo "GMAIL_CLIENT_SECRET=${{ secrets.GMAIL_CLIENT_SECRET }}" >> .env
+          echo "GMAIL_REFRESH_TOKEN=${{ secrets.GMAIL_REFRESH_TOKEN }}" >> .env
+          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" >> .env
+          echo "SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}" >> .env
+          echo "ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}" >> .env
+          echo "REPORT_EMAIL_FROM=${{ secrets.REPORT_EMAIL_FROM }}" >> .env
+          echo "REPORT_EMAIL_TO=${{ secrets.REPORT_EMAIL_TO }}" >> .env
+      - name: Create token.json
+        run: echo '${{ secrets.GMAIL_TOKEN_JSON }}' > token.json
+      - name: Run rapport mensuel
+        run: python main.py --mode=rapport-mensuel

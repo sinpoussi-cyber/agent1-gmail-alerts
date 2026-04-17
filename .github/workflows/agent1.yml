@@ -18,7 +18,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install dependencies
-        run: pip install google-auth google-auth-oauthlib google-api-python-client requests beautifulsoup4 "anthropic==0.49.0" "supabase==2.3.0" python-dotenv postgrest gotrue "httpx==0.27.0" "httpcore==1.0.9" realtime storage3
+        run: pip install google-auth google-auth-oauthlib google-api-python-client requests beautifulsoup4 "anthropic==0.49.0" "supabase==2.10.0" python-dotenv "httpx==0.27.0" "httpcore==1.0.9"
       - name: Create .env
         run: |
           echo "GMAIL_CLIENT_ID=${{ secrets.GMAIL_CLIENT_ID }}" >> .env
@@ -43,7 +43,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install dependencies
-        run: pip install google-auth google-auth-oauthlib google-api-python-client requests beautifulsoup4 "anthropic==0.49.0" "supabase==2.3.0" python-dotenv postgrest gotrue "httpx==0.27.0" "httpcore==1.0.9" realtime storage3
+        run: pip install google-auth google-auth-oauthlib google-api-python-client requests beautifulsoup4 "anthropic==0.49.0" "supabase==2.10.0" python-dotenv "httpx==0.27.0" "httpcore==1.0.9"
       - name: Create .env
         run: |
           echo "GMAIL_CLIENT_ID=${{ secrets.GMAIL_CLIENT_ID }}" >> .env
@@ -68,7 +68,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install dependencies
-        run: pip install google-auth google-auth-oauthlib google-api-python-client requests beautifulsoup4 "anthropic==0.49.0" "supabase==2.3.0" python-dotenv postgrest gotrue "httpx==0.27.0" "httpcore==1.0.9" realtime storage3
+        run: pip install google-auth google-auth-oauthlib google-api-python-client requests beautifulsoup4 "anthropic==0.49.0" "supabase==2.10.0" python-dotenv "httpx==0.27.0" "httpcore==1.0.9"
       - name: Create .env
         run: |
           echo "GMAIL_CLIENT_ID=${{ secrets.GMAIL_CLIENT_ID }}" >> .env
@@ -93,7 +93,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install dependencies
-        run: pip install google-auth google-auth-oauthlib google-api-python-client requests beautifulsoup4 "anthropic==0.49.0" "supabase==2.3.0" python-dotenv postgrest gotrue "httpx==0.27.0" "httpcore==1.0.9" realtime storage3
+        run: pip install google-auth google-auth-oauthlib google-api-python-client requests beautifulsoup4 "anthropic==0.49.0" "supabase==2.10.0" python-dotenv "httpx==0.27.0" "httpcore==1.0.9"
       - name: Create .env
         run: |
           echo "GMAIL_CLIENT_ID=${{ secrets.GMAIL_CLIENT_ID }}" >> .env

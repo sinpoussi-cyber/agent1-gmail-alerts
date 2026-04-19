@@ -8,11 +8,52 @@ def log(msg):
 
 # ── MODE COLLECT ──────────────────────────────────────────────────────────────
 
+def _build_collect_html(date_str, nb_mails, total_links, collected_rapports):
+    if collected_rapports:
+        rows = "".join(
+            f'<tr style="border-bottom:1px solid #ddd;">'
+            f'<td style="padding:8px;">{r["titre"]}</td>'
+            f'<td style="padding:8px;">{r["mot_cle"]}</td>'
+            f'<td style="padding:8px;"><a href="{r["url"]}">{r["url"][:60]}…</a></td>'
+            f'</tr>'
+            for r in collected_rapports
+        )
+        alerts_section = f"""
+        <h3 style="color:#E65C00;">Alertes trouvées</h3>
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <thead>
+            <tr style="background:#f0f0f0;">
+              <th style="padding:8px;text-align:left;">Titre</th>
+              <th style="padding:8px;text-align:left;">Mot-clé</th>
+              <th style="padding:8px;text-align:left;">Lien</th>
+            </tr>
+          </thead>
+          <tbody>{rows}</tbody>
+        </table>"""
+    else:
+        alerts_section = '<p style="color:#888;font-style:italic;">Aucune alerte Google ce jour.</p>'
+
+    return f"""<html><body style="font-family:Arial,sans-serif;max-width:700px;margin:auto;">
+  <div style="background:#E65C00;padding:20px;border-radius:8px 8px 0 0;">
+    <h1 style="color:white;margin:0;font-size:20px;">&#128236; Agent 1 Gmail &mdash; Rapport de collecte &mdash; {date_str}</h1>
+  </div>
+  <div style="padding:20px;background:#f9f9f9;">
+    <p><strong>Mails non lus trouvés :</strong> {nb_mails}</p>
+    <p><strong>Liens analysés :</strong> {total_links}</p>
+    {alerts_section}
+  </div>
+  <div style="padding:15px;background:#eeeeee;font-size:12px;color:#888888;border-radius:0 0 8px 8px;">
+    Cet email est généré automatiquement par Agent 1 Gmail. Ne pas répondre.
+  </div>
+</body></html>"""
+
+
 def run_collect():
     from gmail_reader import get_google_alerts, delete_mail
     from web_scraper import scrape_url
     from claude_analyzer import analyze
     from supabase_client import insert_rapport
+    from email_sender import send_report
 
     log("Démarrage de la collecte Google Alerts...")
 
@@ -21,6 +62,7 @@ def run_collect():
 
     total_mails = 0
     total_links = 0
+    collected_rapports = []
 
     for mail in alerts:
         mail_id = mail["id"]
@@ -64,6 +106,7 @@ def run_collect():
             }
 
             insert_rapport(rapport)
+            collected_rapports.append({"titre": scraped["title"], "mot_cle": keyword, "url": scraped["url"]})
             links_analysed += 1
             total_links += 1
             log(f"  Sauvegarde Supabase OK — sentiment: {analysis.get('sentiment')}, pertinence: {analysis.get('pertinence')}/10")
@@ -74,6 +117,13 @@ def run_collect():
 
     log("─" * 50)
     log(f"Collecte terminée — {total_mails} mail(s) traité(s), {total_links} lien(s) analysé(s).")
+
+    date_str = datetime.now().strftime("%Y-%m-%d")
+    subject_email = f"📬 Agent 1 Gmail — Rapport de collecte — {date_str}"
+    html_body = _build_collect_html(date_str, len(alerts), total_links, collected_rapports)
+    log("Envoi de l'email de collecte...")
+    send_report(subject=subject_email, html_body=html_body)
+    log("Email de collecte envoyé.")
 
 
 # ── MODES RAPPORT ─────────────────────────────────────────────────────────────
@@ -94,8 +144,7 @@ def run_rapport(type_rapport, fetch_fn):
     log("Envoi de l'email...")
     success = send_report(
         subject=report["subject"],
-        body_html=report["body_html"],
-        body_text=report["body_text"],
+        html_body=report["body_html"],
     )
 
     if success and rapports:

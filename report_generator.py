@@ -195,6 +195,84 @@ def _build_text(type_rapport, rapports, subject):
     return "\n".join(lines)
 
 
+# ── RAPPORT JOUR (avec sections hebdo/mensuel optionnelles) ───────────────────
+
+def _build_html_jour(rapports_jour, rapports_hebdo, rapports_mensuel, subject):
+    color = HEADER_COLORS["journalier"]
+    nb = len(rapports_jour)
+    cards = "".join(_alert_card_html(r) for r in rapports_jour) if rapports_jour else (
+        '<p style="color:#888;font-style:italic;">Aucune alerte collectée dans les dernières 24h.</p>'
+    )
+    counts_jour = _sentiment_counts(rapports_jour)
+    summary_jour = _summary_table_html(rapports_jour, counts_jour)
+
+    extra_sections = ""
+    if rapports_hebdo is not None:
+        counts_hebdo = _sentiment_counts(rapports_hebdo)
+        extra_sections += f"""
+        <tr><td style="background:#ffffff;padding:24px 30px;border-top:1px solid #e0e0e0;">
+          <h2 style="margin:0 0 14px 0;font-size:16px;color:#0f9d58;">&#x1F4C5; R&eacute;sum&eacute; de la semaine ({len(rapports_hebdo)} alertes)</h2>
+          {_summary_table_html(rapports_hebdo, counts_hebdo)}
+        </td></tr>"""
+
+    if rapports_mensuel is not None:
+        counts_mensuel = _sentiment_counts(rapports_mensuel)
+        extra_sections += f"""
+        <tr><td style="background:#f8f9fa;padding:24px 30px;border-top:1px solid #e0e0e0;">
+          <h2 style="margin:0 0 14px 0;font-size:16px;color:#f4511e;">&#x1F4C6; R&eacute;sum&eacute; du mois ({len(rapports_mensuel)} alertes)</h2>
+          {_summary_table_html(rapports_mensuel, counts_mensuel)}
+        </td></tr>"""
+
+    return f"""<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f1f3f4;font-family:Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f1f3f4;padding:30px 0;">
+    <tr><td align="center">
+      <table width="640" cellpadding="0" cellspacing="0" style="max-width:640px;width:100%;">
+
+        <!-- HEADER -->
+        <tr><td style="background:{color};border-radius:8px 8px 0 0;padding:30px 30px 20px 30px;">
+          <h1 style="margin:0;color:#ffffff;font-size:22px;">{subject}</h1>
+          <p style="margin:6px 0 0 0;color:rgba(255,255,255,0.85);font-size:14px;">
+            {nb} alerte{"s" if nb != 1 else ""} collect&eacute;e{"s" if nb != 1 else ""} dans les derni&egrave;res 24h
+          </p>
+        </td></tr>
+
+        <!-- ALERTES DU JOUR -->
+        <tr><td style="background:#f8f9fa;padding:24px 30px;">
+          {cards}
+        </td></tr>
+
+        <!-- RÉCAP JOUR -->
+        <tr><td style="background:#ffffff;padding:24px 30px;border-top:1px solid #e0e0e0;">
+          <h2 style="margin:0 0 14px 0;font-size:16px;color:#202124;">R&eacute;capitulatif du jour</h2>
+          {summary_jour}
+        </td></tr>
+
+        {extra_sections}
+
+        <!-- FOOTER -->
+        <tr><td style="background:{color};border-radius:0 0 8px 8px;padding:16px 30px;text-align:center;">
+          <p style="margin:0;color:rgba(255,255,255,0.8);font-size:12px;">
+            Rapport g&eacute;n&eacute;r&eacute; automatiquement par Google Alerts Agent &mdash; {_date_fr()}
+          </p>
+        </td></tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>"""
+
+
+def generate_rapport_jour(rapports_jour, rapports_hebdo=None, rapports_mensuel=None):
+    subject = _subject("journalier")
+    body_html = _build_html_jour(rapports_jour, rapports_hebdo, rapports_mensuel, subject)
+    body_text = _build_text("journalier", rapports_jour, subject)
+    return {"subject": subject, "body_html": body_html, "body_text": body_text}
+
+
 # ── PUBLIC API ────────────────────────────────────────────────────────────────
 
 def generate(rapports, type_rapport):

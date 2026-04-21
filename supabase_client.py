@@ -21,21 +21,21 @@ def insert_rapport(data):
         return None
 
 
-def get_rapports_today():
-    today = date.today().isoformat()
-    tomorrow = (date.today() + timedelta(days=1)).isoformat()
+def get_rapports_since_yesterday_20h():
+    from datetime import datetime, timedelta, timezone
+    now = datetime.now(timezone.utc)
+    since = (now - timedelta(days=1)).replace(hour=20, minute=0, second=0, microsecond=0)
     try:
         response = (
             _client()
             .table(TABLE)
             .select("*")
-            .gte("created_at", today)
-            .lt("created_at", tomorrow)
+            .gte("created_at", since.isoformat())
             .execute()
         )
         return response.data
     except Exception as e:
-        print(f"[supabase] get_rapports_today error: {e}")
+        print(f"[supabase] get_rapports_since_yesterday_20h error: {e}")
         return []
 
 

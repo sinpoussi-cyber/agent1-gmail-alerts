@@ -9,7 +9,6 @@ from bs4 import BeautifulSoup
 
 load_dotenv()
 
-SCOPES = ["https://www.googleapis.com/auth/gmail.modify"]
 TOKEN_FILE = "token.json"
 
 
@@ -28,8 +27,8 @@ def _get_service():
         token=token_data.get("token"),
         refresh_token=token_data.get("refresh_token"),
         token_uri="https://oauth2.googleapis.com/token",
-        client_id=token_data.get("client_id"),
-        client_secret=token_data.get("client_secret"),
+        client_id=os.environ.get("GMAIL_CLIENT_ID") or token_data.get("client_id"),
+        client_secret=os.environ.get("GMAIL_CLIENT_SECRET") or token_data.get("client_secret"),
         scopes=SCOPES
     )
 

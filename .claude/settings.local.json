@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh run *)",
+      "PowerShell(gh run *)",
+      "WebFetch(domain:api.github.com)",
+      "PowerShell(Get-ChildItem *)"
+    ]
+  }
+}
